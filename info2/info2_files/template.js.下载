@@ -1,0 +1,78 @@
+;(function ($) {
+    $.extend({
+        tplOp : {
+            //默认参数
+            params : {
+                left_mark : '{{',    //左侧边界
+                right_mark : '}}',   //右侧边界
+                params : {},         //模版替换参数
+                tpl : '',            //需要被替换的模版
+                tpl1 : '',           //需要被替换的模版 多个
+                container : '',      //容器
+                callback : '',       //回调函数
+            },
+
+            //初始化配置
+            _init_ : function(opts){
+                return $.extend ({}, this.params, opts);
+            },
+
+            //单个替换
+            singleReplace : function(params) {
+                var opts = this._init_(params);
+
+                //没有对象和参数
+                if ($.isEmptyObject (opts.tpl) || $.isEmptyObject (opts.params)) return '';
+
+                var out_str = this.combineTpl(opts,opts.params);
+                opts.container.html(out_str);
+                return out_str;
+            },
+
+            //多替换
+            multiReplace : function(params) {
+                var opts = this._init_(params),
+                    out_str = '';
+
+                //没有对象和参数
+                if ($.isEmptyObject (opts.tpl) || $.isEmptyObject (opts.params)) return '';
+
+                for (var i in opts.params) {
+                    out_str += this.combineTpl(opts,opts.params[i]);
+                }
+
+                if(params.bool) {
+
+                    return out_str;
+                }else{
+                    opts.container.append(out_str);
+                    return opts.container;
+                }
+            },
+
+            //组合模版
+            combineTpl : function(opts,params) {
+                var tpl = opts.tpl;
+
+                for (var i in params) {
+
+                    tpl = tpl.replace(
+                        new RegExp (opts.left_mark + i + opts.right_mark, 'g'),
+                        params[i]
+                    ).replace(
+                        new RegExp ('primary_id', 'g'),
+                        params['id']
+
+                    ).replace(
+                        new RegExp ('link_', 'g'),
+                        params['action']
+
+                    );
+
+                }
+
+                return tpl;
+            }
+        }
+    });
+})(jQuery);
